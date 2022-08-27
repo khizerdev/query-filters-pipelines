@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\QueryFilters\UnsolvedQueryFilter;
+use App\Models\Discussion;
+
+use Illuminate\Routing\Pipeline as RoutingPipeline;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +18,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+
+    $discussions = app(RoutingPipeline::class)
+                    ->send(Discussion::latest())
+                    ->through([
+                        UnsolvedQueryFilter::class
+                    ])
+                    ->thenReturn()
+                    ->get();
+
+    // dd($discussions);
+    
+    return view('welcome' , compact('discussions'));
 });
